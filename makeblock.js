@@ -113,7 +113,9 @@
 					value = readDouble(position);
 				}
 				if(type<=5){
-					_selectors["value_"+extId] = value;
+					if(value!=null){
+						_selectors["value_"+extId] = value;
+					}
 					_selectors["callback_"+extId](value);
 				}
 				_buffer = []
@@ -206,7 +208,7 @@
 		var extId = buffer[4];
 		setTimeout(function(){
 			callback(_selectors["value_"+extId]);
-		},200);
+		},100);
 		writePackage();
 	}
 	function writePackage(){
@@ -254,7 +256,7 @@
 
     //************* mBot Blocks ***************//
     function genNextID(port, slot){
-		var nextID = (port << 4) | slot;
+		var nextID = port * 4 + slot;
 		return nextID;
 	}
     ext.resetAll = function(){
