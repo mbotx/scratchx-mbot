@@ -197,6 +197,13 @@
 	   		}
 	   	}, 20);
 	};
+	var lastWritten = 0;
+	function writePackage(buffer,callback){
+		if(new Date().getTime()-lastWritten>20){
+			lastWritten = new Date().getTime();
+			device.write(buffer,callback); 
+		}
+	}
 	ext._getStatus = function() {
         return status?{status: 2, msg: 'Ready'}:{status: 1, msg: 'Not Ready'};
     };
@@ -234,7 +241,7 @@
 	}
     ext.resetAll = function(){
     	var data = [0x5,0xff, 0x55, 0x02, 0x0, 0x04];
- 		device.write(arrayBufferFromArray(data), function(){
+ 		writePackage(arrayBufferFromArray(data), function(){
  		})
     };
     ext.runBot = function(lSpeed,rSpeed){
@@ -242,7 +249,7 @@
 		var extId = 0;
 		var data = [extId, 0x02, deviceId].concat(short2array(-lSpeed)).concat(short2array(rSpeed));
 		data = [data.length+3, 0xff, 0x55, data.length].concat(data);
- 		device.write(arrayBufferFromArray(data), function(){
+ 		writePackage(arrayBufferFromArray(data), function(){
  		});
     }
     ext.runMotor = function(port,speed){
@@ -253,7 +260,7 @@
 		var extId = 0;
 		var data = [extId, 0x02, deviceId, port].concat(short2array(speed));
 		data = [data.length+3, 0xff, 0x55, data.length].concat(data);
- 		device.write(arrayBufferFromArray(data), function(){
+ 		writePackage(arrayBufferFromArray(data), function(){
  		});
     }
     ext.runServo = function(port,slot,angle){
@@ -267,7 +274,7 @@
 		var extId = 0;
 		var data = [extId, 0x02, deviceId, port, slot, angle];
 		data = [data.length+3, 0xff, 0x55, data.length].concat(data);
- 		device.write(arrayBufferFromArray(data), function(){
+ 		writePackage(arrayBufferFromArray(data), function(){
  		});
     }
     ext.runLedOnBoard = function(index,red,green,blue){
@@ -293,7 +300,7 @@
 		var extId = 0;
 		var data = [extId, 0x02, deviceId, port, slot, index, red*1, green*1, blue*1];
 		data = [data.length+3, 0xff, 0x55, data.length].concat(data);
- 		device.write(arrayBufferFromArray(data), function(){
+ 		writePackage(arrayBufferFromArray(data), function(){
  		});
     }
 	ext.runBuzzer = function(tone,beat){
@@ -307,7 +314,7 @@
 		var extId = 0;
 		var data = [extId, 0x02, deviceId].concat(short2array(tone)).concat(short2array(beat));
 		data = [data.length+3, 0xff, 0x55, data.length].concat(data);
- 		device.write(arrayBufferFromArray(data), function(){
+ 		writePackage(arrayBufferFromArray(data), function(){
  		});
 	};
 	ext.stopBuzzer = function(){
@@ -322,7 +329,7 @@
 		var brightness = 6;
 		var data = [extId, 0x02, deviceId, port,1,brightness,3].concat(short2array(x)).concat(short2array(7+y)).concat([msg.length].concat(string2array(msg)));
 		data = [data.length+3, 0xff, 0x55, data.length].concat(data);
- 		device.write(arrayBufferFromArray(data), function(){
+ 		writePackage(arrayBufferFromArray(data), function(){
  		});
 	}
 	ext.showTime = function(port,hour,dot,min){
@@ -334,7 +341,7 @@
 		var brightness = 6;
 		var data = [extId, 0x02, deviceId, port,3,brightness,dot==":"?1:0].concat(short2array(hour)).concat(short2array(min));
 		data = [data.length+3, 0xff, 0x55, data.length].concat(data);
- 		device.write(arrayBufferFromArray(data), function(){
+ 		writePackage(arrayBufferFromArray(data), function(){
  		});
 	}
 	ext.runSevseg = function(port,num){
@@ -345,7 +352,7 @@
 		var extId = 0;
 		var data = [extId, 0x02, deviceId, port].concat(float2array(num));
 		data = [data.length+3, 0xff, 0x55, data.length].concat(data);
- 		device.write(arrayBufferFromArray(data), function(){
+ 		writePackage(arrayBufferFromArray(data), function(){
  		});
 	}
 	ext.runLightSensor = function(port,status){
@@ -359,7 +366,7 @@
 		var extId = 0;
 		var data = [extId, 0x02, deviceId, port,status];
 		data = [data.length+3, 0xff, 0x55, data.length].concat(data);
- 		device.write(arrayBufferFromArray(data), function(){
+ 		writePackage(arrayBufferFromArray(data), function(){
  		});
 	}
 	ext.runShutter = function(port,shutter){
@@ -373,7 +380,7 @@
 		var extId = 0;
 		var data = [extId, 0x02, deviceId, port,shutter];
 		data = [data.length+3, 0xff, 0x55, data.length].concat(data);
- 		device.write(arrayBufferFromArray(data), function(){
+ 		writePackage(arrayBufferFromArray(data), function(){
  		});
 	}
 	ext.getButtonOnBoard = function(status,callback){
@@ -385,7 +392,7 @@
 		var extId = genNextID(port,0);
 		var data = [extId, 0x01, deviceId, port];
 		data = [data.length+3, 0xff, 0x55, data.length].concat(data);
- 		device.write(arrayBufferFromArray(data), function(){
+ 		writePackage(arrayBufferFromArray(data), function(){
  			console.log("written");
  		});
 		_selectors["callback_"+extId] = function(v){
@@ -405,7 +412,7 @@
 			var extId = genNextID(port,status);
 			var data = [extId, 0x01, deviceId, port];
 			data = [data.length+3, 0xff, 0x55, data.length].concat(data);
-	 		device.write(arrayBufferFromArray(data), function(){
+	 		writePackage(arrayBufferFromArray(data), function(){
 	 			console.log("written");
 	 		});
 			_selectors["callback_"+extId] = function(v){
@@ -424,7 +431,7 @@
 		var extId = genNextID(port,0);
 		var data = [extId, 0x01, deviceId, port];
 		data = [data.length+3, 0xff, 0x55, data.length].concat(data);
- 		device.write(arrayBufferFromArray(data), function(){
+ 		writePackage(arrayBufferFromArray(data), function(){
  			console.log("written");
  		});
 		_selectors["callback_"+extId] = callback; 
@@ -437,7 +444,7 @@
 		var extId = genNextID(port,0);
 		var data = [extId, 0x01, deviceId, port];
 		data = [data.length+3, 0xff, 0x55, data.length].concat(data);
- 		device.write(arrayBufferFromArray(data), function(){
+ 		writePackage(arrayBufferFromArray(data), function(){
  		});
 		_selectors["callback_"+extId] = function(v){
 			callback(Math.floor(v*100.0)/100.0); 
@@ -451,7 +458,7 @@
 		var extId = genNextID(port,0);
 		var data = [extId, 0x01, deviceId, port];
 		data = [data.length+3, 0xff, 0x55, data.length].concat(data);
- 		device.write(arrayBufferFromArray(data), function(){
+ 		writePackage(arrayBufferFromArray(data), function(){
  		});
 		_selectors["callback_"+extId] = callback;
 	}
@@ -466,7 +473,7 @@
 		var extId = genNextID(port,ax);
 		var data = [extId, 0x01, deviceId, port, ax];
 		data = [data.length+3, 0xff, 0x55, data.length].concat(data);
- 		device.write(arrayBufferFromArray(data), function(){
+ 		writePackage(arrayBufferFromArray(data), function(){
  		});
 		_selectors["callback_"+extId] = callback;
 	}
@@ -478,7 +485,7 @@
 		var extId = genNextID(port,0);
 		var data = [extId, 0x01, deviceId, port];
 		data = [data.length+3, 0xff, 0x55, data.length].concat(data);
- 		device.write(arrayBufferFromArray(data), function(){
+ 		writePackage(arrayBufferFromArray(data), function(){
  		});
 		_selectors["callback_"+extId] = callback;
 	}
@@ -490,7 +497,7 @@
 		var extId = genNextID(port,0);
 		var data = [extId, 0x01, deviceId, port];
 		data = [data.length+3, 0xff, 0x55, data.length].concat(data);
- 		device.write(arrayBufferFromArray(data), function(){
+ 		writePackage(arrayBufferFromArray(data), function(){
  		});
 		_selectors["callback_"+extId] = callback;
 	}
@@ -505,7 +512,7 @@
 		var extId = genNextID(port,slot);
 		var data = [extId, 0x01, deviceId, port, slot];
 		data = [data.length+3, 0xff, 0x55, data.length].concat(data);
- 		device.write(arrayBufferFromArray(data), function(){
+ 		writePackage(arrayBufferFromArray(data), function(){
  		});
 		_selectors["callback_"+extId] = callback;
 	}
@@ -517,7 +524,7 @@
 		var extId = genNextID(port,0);
 		var data = [extId, 0x01, deviceId, port];
 		data = [data.length+3, 0xff, 0x55, data.length].concat(data);
- 		device.write(arrayBufferFromArray(data), function(){
+ 		writePackage(arrayBufferFromArray(data), function(){
  		});
 		_selectors["callback_"+extId] = function(v){
 			callback(Math.floor(v*100)/100);
@@ -531,7 +538,7 @@
 		var extId = genNextID(port,0);
 		var data = [extId, 0x01, deviceId, port];
 		data = [data.length+3, 0xff, 0x55, data.length].concat(data);
- 		device.write(arrayBufferFromArray(data), function(){
+ 		writePackage(arrayBufferFromArray(data), function(){
  		});
 		_selectors["callback_"+extId] = callback;
 	}
@@ -550,7 +557,7 @@
 		var extId = genNextID(port,slot);
 		var data = [extId, 0x01, deviceId, 0, code];
 		data = [data.length+3, 0xff, 0x55, data.length].concat(data);
- 		device.write(arrayBufferFromArray(data), function(){
+ 		writePackage(arrayBufferFromArray(data), function(){
  		});
 		_selectors["callback_"+extId] = callback;
 	}
