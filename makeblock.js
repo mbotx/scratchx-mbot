@@ -320,7 +320,7 @@
 		var deviceId = 41;
 		var extId = 0;
 		var brightness = 6;
-		var data = [extId, 0x02, deviceId, port,1,brightness,3].concat(short2array(x)).concat(short2array(7-y)).concat([msg.length].concat(string2array(msg)));
+		var data = [extId, 0x02, deviceId, port,1,brightness,3].concat(short2array(x)).concat(short2array(7+y)).concat([msg.length].concat(string2array(msg)));
 		data = [data.length+3, 0xff, 0x55, data.length].concat(data);
  		device.write(arrayBufferFromArray(data), function(){
  		});
