@@ -93,7 +93,6 @@
 				position+=1;
 				var value = 0;
 				// 1 byte 2 float 3 short 4 len+string 5 double
-
 				if (type == 1){
 					value = _buffer[position];
 				}
@@ -216,26 +215,21 @@
 			_isWaiting = true;
 			var buffer = _buffers[0];
 			_buffers.shift();
-			mConnection.postMessage(buffer);
+			var msg = {};
+			msg.buffer = buffer;
+			mConnection.postMessage(msg);
 			setTimeout(function(){
 					_isWaiting = false;
 					writePackage();
 				},20); 
 		}
 	}
-	ext._getStatus = function() {
-        return mStatus?{status: 2, msg: 'Ready'}:{status: 1, msg: 'Not Ready'};
-    };
-	ext._shutdown = function() {
-	    if(poller) poller = clearInterval(poller);
-	    status = false;
-	}
 	var arrayBufferFromArray = function(data){
         var result = new Int8Array(data.length);
         for(var i=0;i<data.length;i++){
             result[i] = data[i];
         }
-        return result;
+        return data;
     }
 
     //************* mBot Blocks ***************//
@@ -611,8 +605,15 @@
     var makeblockAppID = "hciagmngckbmimcoebjajffobnaklbcg"; //unique app ID for Hummingbird Scratch App
     var mConnection;
     var mStatus = 0;
-    var getMakeblockAppStatus = function () {
-        console.log("status");
+
+	ext._getStatus = function() {
+        return {status: mStatus, msg: mStatus==2?'Ready':'Not Ready'};
+    };
+	ext._shutdown = function() {
+	    if(poller) poller = clearInterval(poller);
+	    status = false;
+	}
+    function getMakeblockAppStatus() {
         chrome.runtime.sendMessage(makeblockAppID, {message: "STATUS"}, function (response) {
             if (response === undefined) { //Chrome app not found
                 console.log("Chrome app not found");
@@ -620,19 +621,12 @@
                 setTimeout(getMakeblockAppStatus, 1000);
             }
             else if (response.status === false) { //Chrome app says not connected
-                if (mStatus !== 1) {
-                    console.log("Not connected");
-                    mConnection = chrome.runtime.connect(makeblockAppID);
-                    mConnection.onMessage.addListener(onMsgApp);
-                }
                 mStatus = 1;
                 setTimeout(getMakeblockAppStatus, 1000);
             }
             else {// successfully connected
                 if (mStatus !==2) {
                     console.log("Connected");
-                    var isDuo = response.duo;
-                    console.log("isDuo: " + isDuo);
                     mConnection = chrome.runtime.connect(makeblockAppID);
                     mConnection.onMessage.addListener(onMsgApp);
                 }
@@ -641,9 +635,10 @@
             }
         });
     };
-    var onMsgApp = function (msg) {
-        for(var i=0;i<msg.length;i++){
-        	onParse(msg[i]);
+    function onMsgApp(msg) {
+		var buffer = msg.buffer;
+        for(var i=0;i<buffer.length;i++){
+        	onParse(buffer[i]);
         }
     };
     getMakeblockAppStatus();
