@@ -433,7 +433,7 @@
 			port = ports[port];
 		}
 		var deviceId = 1;
-		var extId = genNextID(port,0);
+		var extId = 0;//genNextID(port,0);
 		var data = [extId, 0x01, deviceId, port];
 		data = [data.length+3, 0xff, 0x55, data.length].concat(data);
 		_selectors["callback_"+extId] = function(v){
