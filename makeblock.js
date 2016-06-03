@@ -72,15 +72,15 @@
 			"C7":2093,"D7":2349,"E7":2637,"F7":2794,"G7":3136,"A7":3520,"B7":3951,
 	"C8":4186,"D8":4699};
 	var beats = {"Half":500,"Quater":250,"Eighth":125,"Whole":1000,"Double":2000,"Zero":0};
-	
+
 	function onParse(byte){
 		position = 0
-		value = 0	
+		value = 0
 		_buffer.push(byte);
 		var len = _buffer.length;
 		if(len>= 2){
 			if (_buffer[len-1]==0x55 && _buffer[len-2]==0xff){
-				_isParseStartIndex = len-2	
+				_isParseStartIndex = len-2
 				_isParseStart = true;
 			}
 			if (_buffer[len-1]==0xa && _buffer[len-2]==0xd && _isParseStart == true){
@@ -185,7 +185,7 @@
 	    if (dev == null) device = null;
 
 	    // otherwise start polling
-	   	poller = setInterval(function() { 
+	   	poller = setInterval(function() {
 	   		if(device!=null){
 	   			function callback(buffer){
 	   				var buf = new Uint8Array(buffer);
@@ -221,7 +221,7 @@
 					_isWaiting = false;
 					writePackage();
 				},20);
-			}); 
+			});
 		}
 	}
 	ext._getStatus = function() {
@@ -437,7 +437,7 @@
  			addPackage(arrayBufferFromArray(data), _selectors["callback_"+extId]);
     	}
     	return _lastButtonStatus[status];
-		
+
 	}
 	ext.getLightSensor = function(port,callback){
 		if(typeof port=="string"){
@@ -447,7 +447,7 @@
 		var extId = genNextID(port,0);
 		var data = [extId, 0x01, deviceId, port];
 		data = [data.length+3, 0xff, 0x55, data.length].concat(data);
-		_selectors["callback_"+extId] = callback; 
+		_selectors["callback_"+extId] = callback;
  		addPackage(arrayBufferFromArray(data), _selectors["callback_"+extId]);
 	}
 	ext.getUltrasonic = function(port,callback){
@@ -459,7 +459,7 @@
 		var data = [extId, 0x01, deviceId, port];
 		data = [data.length+3, 0xff, 0x55, data.length].concat(data);
 		_selectors["callback_"+extId] = function(v){
-			callback(Math.floor(v*100.0)/100.0); 
+			callback(Math.floor(v*100.0)/100.0);
 		}
  		addPackage(arrayBufferFromArray(data), _selectors["callback_"+extId]);
 	}
@@ -566,43 +566,93 @@
 		_selectors["callback_"+extId] = callback;
  		addPackage(arrayBufferFromArray(data), _selectors["callback_"+extId]);
 	}
-	var descriptor = {
-        blocks: [
-        	[" ", "move left %d.motorvalue right %d.motorvalue","runBot", 100, 100],
-			[" ", "set motor%d.motorPort speed %d.motorvalue","runMotor", "M1", 0],
-			[" ", "set servo %d.port %d.slot angle %d.servovalue","runServo", "Port1","Slot1", 90],
-			[" ", "set led %d.lport %d.slot %d.index red%d.value green%d.value blue%d.value","runLed","on board","Slot1","all",0,0,0],
-			[" ", "play tone on note %d.note beat %d.beats","runBuzzer", "C4", "Half"],
-			[" ", "show face %d.port x:%n y:%n characters:%s","showCharacters", "Port1", 0,0,"Hello"],
-			[" ", "show time %d.port hour:%n %m.points min:%n","showTime", "Port1", 10,":",20],
-			[" ", "show drawing %d.port x:%n y:%n draw:%m.drawFace","showDraw", "Port1", 0,0,"        "],
-			["-"],
-			[" ", "set 7-segments display%d.port number %n","runSevseg", "Port1", 100],
-			[" ", "set light sensor %d.aport led as %d.switchStatus","runLightSensor", "Port3", "On"],
-			[" ", "set camera shutter %d.port as %d.shutter","runShutter","Port1", "Press"],
-			["-"],
-			["h", "when button %m.buttonStatus","whenButtonPressed","pressed"],
-			["R", "button %m.buttonStatus","getButtonOnBoard","pressed"],
-			["R", "light sensor %d.laport","getLightSensor","light sensor on board"],
-			["-"],
-			["R", "ultrasonic sensor %d.port distance","getUltrasonic","Port1"],
-			["R", "line follower %d.port","getLinefollower","Port1"],
-			["R", "joystick %d.aport %d.Axis","getJoystick","Port3","X-Axis"],
-			["R", "potentiometer %d.aport","getPotentiometer","Port3"],
-			["R", "sound sensor %d.aport","getSoundSensor","Port3"],
-			["R", "limit switch %d.port %d.slot","getLimitswitch","Port1","Slot1"],
-			["R", "temperature %d.port %d.slot °C","getTemperature","Port3","Slot1"],
-			["R", "pir motion sensor %d.port","getPirmotion","Port2"],
-			["-"],
-			["R","ir remote %m.ircode pressed","getIrRemote","A"],
-			["-"],
-			[" ", "send mBot's message %s","runIR", "hello"],
-			["R", "mBot's message received","getIR"],
-			["-"],
-			["R", "timer","getTimer", "0"],	
-			[" ", "reset timer","resetTimer", "0"]
+
+	  // Check for GET param 'lang'
+	  var paramString = window.location.search.replace(/^\?|\/$/g, '');
+	  var vars = paramString.split("&");
+	  var lang = 'en';
+	  for (var i=0; i<vars.length; i++) {
+	    var pair = vars[i].split('=');
+	    if (pair.length > 1 && pair[0]=='lang')
+	      lang = pair[1];
+	  }
+
+	var blocks = {
+        en: [
+	        	[" ", "move left %d.motorvalue right %d.motorvalue","runBot", 100, 100],
+				[" ", "set motor%d.motorPort speed %d.motorvalue","runMotor", "M1", 0],
+				[" ", "set servo %d.port %d.slot angle %d.servovalue","runServo", "Port1","Slot1", 90],
+				[" ", "set led %d.lport %d.slot %d.index red%d.value green%d.value blue%d.value","runLed","on board","Slot1","all",0,0,0],
+				[" ", "play tone on note %d.note beat %d.beats","runBuzzer", "C4", "Half"],
+				[" ", "show face %d.port x:%n y:%n characters:%s","showCharacters", "Port1", 0,0,"Hello"],
+				[" ", "show time %d.port hour:%n %m.points min:%n","showTime", "Port1", 10,":",20],
+				[" ", "show drawing %d.port x:%n y:%n draw:%m.drawFace","showDraw", "Port1", 0,0,"        "],
+				["-"],
+				[" ", "set 7-segments display%d.port number %n","runSevseg", "Port1", 100],
+				[" ", "set light sensor %d.aport led as %d.switchStatus","runLightSensor", "Port3", "On"],
+				[" ", "set camera shutter %d.port as %d.shutter","runShutter","Port1", "Press"],
+				["-"],
+				["h", "when button %m.buttonStatus","whenButtonPressed","pressed"],
+				["R", "button %m.buttonStatus","getButtonOnBoard","pressed"],
+				["R", "light sensor %d.laport","getLightSensor","light sensor on board"],
+				["-"],
+				["R", "ultrasonic sensor %d.port distance","getUltrasonic","Port1"],
+				["R", "line follower %d.port","getLinefollower","Port1"],
+				["R", "joystick %d.aport %d.Axis","getJoystick","Port3","X-Axis"],
+				["R", "potentiometer %d.aport","getPotentiometer","Port3"],
+				["R", "sound sensor %d.aport","getSoundSensor","Port3"],
+				["R", "limit switch %d.port %d.slot","getLimitswitch","Port1","Slot1"],
+				["R", "temperature %d.port %d.slot °C","getTemperature","Port3","Slot1"],
+				["R", "pir motion sensor %d.port","getPirmotion","Port2"],
+				["-"],
+				["R","ir remote %m.ircode pressed","getIrRemote","A"],
+				["-"],
+				[" ", "send mBot's message %s","runIR", "hello"],
+				["R", "mBot's message received","getIR"],
+				["-"],
+				["R", "timer","getTimer", "0"],
+				[" ", "reset timer","resetTimer", "0"]
 			],
-        menus: {
+		el: [
+				[" ", "κινήσου αριστερά %d.motorvalue right %d.motorvalue","runBot", 100, 100],
+				[" ", "όρισε τον κινητήρα%d.motorPort speed %d.motorvalue","runMotor", "M1", 0],
+				[" ", "όρισε τον σερβοκινητήρα %d.port %d.slot angle %d.servovalue","runServo", "Port1","Slot1", 90],
+				[" ", "ορισε το led %d.lport %d.slot %d.index red%d.value green%d.value blue%d.value","runLed","on board","Slot1","all",0,0,0],
+				[" ", "παίξε τόνο στη νότα %d.note beat %d.beats","runBuzzer", "C4", "Half"],
+				[" ", "δείξε πρόσωπο %d.port x:%n y:%n characters:%s","showCharacters", "Port1", 0,0,"Hello"],
+				[" ", "δείξε ώρα %d.port hour:%n %m.points min:%n","showTime", "Port1", 10,":",20],
+				[" ", "δείξε ζωγραφιά %d.port x:%n y:%n draw:%m.drawFace","showDraw", "Port1", 0,0,"        "],
+				["-"],
+				[" ", "όρισε την οθόνη 7 τμημάτων %d.port number %n","runSevseg", "Port1", 100],
+				[" ", "όρισε τον αισθητήρα φωτός %d.aport led as %d.switchStatus","runLightSensor", "Port3", "On"],
+				[" ", "όρισε το κλείστρο της κάμερας %d.port as %d.shutter","runShutter","Port1", "Press"],
+				["-"],
+				["h", "όταν πατηθεί το κουμπί %m.buttonStatus","whenButtonPressed","pressed"],
+				["R", "κουμπί %m.buttonStatus","getButtonOnBoard","pressed"],
+				["R", "αισθητήρας φωτός %d.laport","getLightSensor","light sensor on board"],
+				["-"],
+				["R", "αισθητήρας υπέρηχων %d.port distance","getUltrasonic","Port1"],
+				["R", "αισθητήρας γραμμής %d.port","getLinefollower","Port1"],
+				["R", "joystick %d.aport %d.Axis","getJoystick","Port3","X-Axis"],
+				["R", "ποντεσιόμετρο %d.aport","getPotentiometer","Port3"],
+				["R", "αισθητήρας ήχου %d.aport","getSoundSensor","Port3"],
+				["R", "διακόπτης ορίου %d.port %d.slot","getLimitswitch","Port1","Slot1"],
+				["R", "θερμοκρασία %d.port %d.slot °C","getTemperature","Port3","Slot1"],
+				["R", "αισθητήρας κίνησης %d.port","getPirmotion","Port2"],
+				["-"],
+				["R","τηλεχειρηστήριο υπερύθρων %m.ircode pressed","getIrRemote","A"],
+				["-"],
+				[" ", "στείλε το μήνυμα του mBot %s","runIR", "hello"],
+				["R", "το μύνημα του mBot λήφθηκε","getIR"],
+				["-"],
+				["R", "χρονομετρητής","getTimer", "0"],
+				[" ", "επαναφορά χρονομετρητή","resetTimer", "0"]
+			]		
+		};
+
+
+    var menus = {
+    	en:{
 			motorPort:["M1","M2"],
 			slot:["Slot1","Slot2"],
 			index:["all",1,2],
@@ -622,8 +672,36 @@
 			shutter:["Press","Release","Focus On","Focus Off"],
 			switchStatus:["Off","On"],
 			ircode:["A","B","C","D","E","F","↑","↓","←","→","Setting","R0","R1","R2","R3","R4","R5","R6","R7","R8","R9"],
+		},
+		el:{
+			motorPort:["M1","M2"],
+			slot:["Slot1","Slot2"],
+			index:["all",1,2],
+			Axis:["X-Axis","Y-Axis"],
+			port:["Port1","Port2","Port3","Port4"],
+			aport:["Port3","Port4"],
+			lport:["led στην πλακέτα","Port1","Port2","Port3","Port4"],
+			laport:["αισθητήρας φωτός στην πλακέτα","Port3","Port4"],
+			direction:["τρέξε μπροστά","τρέξε πίσω","στρίψε δεξιά","στρίψε αριστερά"],
+			points:[":"," "],
+			note:["C2","D2","E2","F2","G2","A2","B2","C3","D3","E3","F3","G3","A3","B3","C4","D4","E4","F4","G4","A4","B4","C5","D5","E5","F5","G5","A5","B5","C6","D6","E6","F6","G6","A6","B6","C7","D7","E7","F7","G7","A7","B7","C8","D8"],
+			beats:["Μισό","Τέταρτο","Όγδοο","Ολόκληρο","Διπλό","Μηδενικό"],
+			servovalue:[0,45,90,135,180],
+			motorvalue:[-255,-100,-50,0,50,100,255],
+			value:[0,20,60,150,255],
+			buttonStatus:["πατήθηκε","αφέθηκε"],
+			shutter:["Press","Release","Focus On","Focus Off"],
+			switchStatus:["Off","On"],
+			ircode:["A","B","C","D","E","F","↑","↓","←","→","Setting","R0","R1","R2","R3","R4","R5","R6","R7","R8","R9"],	
 		}
     };
 	var hid_info = {type: 'hid', vendor: 0x0416, product: 0xffff};
+
+  var descriptor = {
+		blocks : blocks[lang],
+		menus : menus[lang],
+		url: 'http://emnik.github.io/scratchx-mbot/makeblock.js'
+	}
+
 	ScratchExtensions.register('Makeblock mBot', descriptor, ext, hid_info);
 })({});
