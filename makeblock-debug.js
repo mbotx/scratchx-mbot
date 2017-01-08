@@ -605,7 +605,23 @@
     var makeblockAppID = "ogpaopffkincgenkbbiedlfleljflfkf"; //unique app ID for Hummingbird Scratch App
     var mConnection;
     var mStatus = 0;
-
+	function getRequest() {
+	    var url = location.search; 
+	    var theRequest = new Object();
+	    if (url.indexOf("?") != -1) {
+		var str = url.substr(1);
+		if (str.indexOf("&") != -1) {
+		    strs = str.split("&");
+		    for (var i = 0; i < strs.length; i++) {
+			theRequest[strs[i].split("=")[0]] = unescape(strs[i].split("=")[1]);
+		    }
+		} else {
+		    theRequest[str.split("=")[0]] = unescape(str.split("=")[1]);
+		}
+	    }
+	    return theRequest;
+	}
+	console.log("id:",getRequest().id);
 	ext._getStatus = function() {
         return {status: mStatus, msg: mStatus==2?'Ready':'Not Ready'};
     };
