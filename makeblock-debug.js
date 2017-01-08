@@ -602,7 +602,6 @@
 			ircode:["A","B","C","D","E","F","↑","↓","←","→","Setting","R0","R1","R2","R3","R4","R5","R6","R7","R8","R9"],
 		}
     };
-    var makeblockAppID = "ogpaopffkincgenkbbiedlfleljflfkf"; //unique app ID for Hummingbird Scratch App
     var mConnection;
     var mStatus = 0;
 	function getRequest() {
@@ -621,7 +620,8 @@
 	    }
 	    return theRequest;
 	}
-	console.log("id:",getRequest().id);
+	var makeblockAppID = getRequest().id?getRequest().id:"ogpaopffkincgenkbbiedlfleljflfkf"; //unique app ID for Hummingbird Scratch App
+   
 	ext._getStatus = function() {
         return {status: mStatus, msg: mStatus==2?'Ready':'Not Ready'};
     };
