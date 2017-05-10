@@ -757,7 +757,7 @@
   var descriptor = {
 		blocks : blocks[lang],
 		menus : menus[lang],
-		url: 'http://emnik.github.io/scratchx-mbot/makeblock.js'
+		url: 'http://leleoalmeida.github.io/scratchx-mbot/makeblock.js'
 	}
 
 	ScratchExtensions.register('Makeblock mBot', descriptor, ext, hid_info);
