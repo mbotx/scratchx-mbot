@@ -647,6 +647,41 @@
 				["-"],
 				["R", "χρονομετρητής","getTimer", "0"],
 				[" ", "επαναφορά χρονομετρητή","resetTimer", "0"]
+			],
+		pt: [
+	        	[" ", "mover esquerdo %d.motorvalue direito %d.motorvalue","runBot", 100, 100],
+				[" ", "estabelecer motor%d.motorPort velocidade %d.motorvalue","runMotor", "M1", 0],
+				[" ", "estabelecer servo %d.port %d.slot angulo %d.servovalue","runServo", "Port1","Slot1", 90],
+				[" ", "estabelecer led %d.lport %d.slot %d.index red%d.value green%d.value blue%d.value","runLed","on board","Slot1","all",0,0,0],
+				[" ", "tocar tom na nota %d.note batida %d.beats","runBuzzer", "C4", "Metade"],
+				[" ", "mostrar cara %d.port x:%n y:%n characters:%s","showCharacters", "Port1", 0,0,"Ola"],
+				[" ", "mostrar tempo %d.port hour:%n %m.points min:%n","showTime", "Port1", 10,":",20],
+				[" ", "mostrar desenho %d.port x:%n y:%n draw:%m.drawFace","showDraw", "Port1", 0,0,"        "],
+				["-"],
+				[" ", "estabelecer 7-segmentos display%d.port número %n","runSevseg", "Port1", 100],
+				[" ", "estabelecer sensor de luz %d.aport led como %d.switchStatus","runLightSensor", "Port3", "Ligado"],
+				[" ", "estabelecer obturador da camera %d.port como %d.shutter","runShutter","Port1", "Pressionar"],
+				["-"],
+				["h", "quando botão %m.buttonStatus","whenButtonPressed","pressionado"],
+				["R", "botão %m.buttonStatus","getButtonOnBoard","pressionado"],
+				["R", "sensor de luz %d.laport","getLightSensor","sensor de luz on board"],
+				["-"],
+				["R", "sensor ultrasom %d.port distance","getUltrasonic","Port1"],
+				["R", "segue linha %d.port","getLinefollower","Port1"],
+				["R", "joystick %d.aport %d.Axis","getJoystick","Port3","Eixo-X"],
+				["R", "potenciometro %d.aport","getPotentiometer","Port3"],
+				["R", "sensor de som %d.aport","getSoundSensor","Port3"],
+				["R", "switch limite %d.port %d.slot","getLimitswitch","Port1","Slot1"],
+				["R", "temperatura %d.port %d.slot °C","getTemperature","Port3","Slot1"],
+				["R", "sensor de presença %d.port","getPirmotion","Port2"],
+				["-"],
+				["R","controle remoto %m.ircode pressed","getIrRemote","A"],
+				["-"],
+				[" ", "enviar mensagem do mBot %s","runIR", "ola"],
+				["R", "mensagem recebida","getIR"],
+				["-"],
+				["R", "cronometro","getTimer", "0"],
+				[" ", "zerar cronometro","resetTimer", "0"]
 			]		
 		};
 
@@ -693,14 +728,36 @@
 			shutter:["Press","Release","Focus On","Focus Off"],
 			switchStatus:["Off","On"],
 			ircode:["A","B","C","D","E","F","↑","↓","←","→","Setting","R0","R1","R2","R3","R4","R5","R6","R7","R8","R9"],	
+		},
+    	pt:{
+			motorPort:["M1","M2"],
+			slot:["Slot1","Slot2"],
+			index:["todos",1,2],
+			Axis:["Eixo-X","Eixo-Y"],
+			port:["Port1","Port2","Port3","Port4"],
+			aport:["Port3","Port4"],
+			lport:["led on board","Port1","Port2","Port3","Port4"],
+			laport:["sensor de luz on board","Port3","Port4"],
+			direction:["andar para a frente","andar para trás","virar a direita","virar a esquerda"],
+			points:[":"," "],
+			note:["C2","D2","E2","F2","G2","A2","B2","C3","D3","E3","F3","G3","A3","B3","C4","D4","E4","F4","G4","A4","B4","C5","D5","E5","F5","G5","A5","B5","C6","D6","E6","F6","G6","A6","B6","C7","D7","E7","F7","G7","A7","B7","C8","D8"],
+			beats:["Metade","Quarto","Oitavo","Inteira","Dupla","Zero"],
+			servovalue:[0,45,90,135,180],
+			motorvalue:[-255,-100,-50,0,50,100,255],
+			value:[0,20,60,150,255],
+			buttonStatus:["pressionado","liberado"],
+			shutter:["Pressionar","Liberar","Foco Ligado","Foco Desligado"],
+			switchStatus:["Desligado","Ligado"],
+			ircode:["A","B","C","D","E","F","↑","↓","←","→","Configuração","R0","R1","R2","R3","R4","R5","R6","R7","R8","R9"],
 		}
+
     };
 	var hid_info = {type: 'hid', vendor: 0x0416, product: 0xffff};
 
   var descriptor = {
 		blocks : blocks[lang],
 		menus : menus[lang],
-		url: 'http://emnik.github.io/scratchx-mbot/makeblock.js'
+		url: 'http://leleoalmeida.github.io/scratchx-mbot/makeblock.js'
 	}
 
 	ScratchExtensions.register('Makeblock mBot', descriptor, ext, hid_info);
