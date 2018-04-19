@@ -2,4 +2,5 @@
   <site-control permitted-cross-domain-policies="master-only"/>
   <allow-access-from domain="scratchx.org"/>
   <allow-access-from domain="llk.github.io"/>
+  <allow-access-from domain="leleoalmeida.github.io"/>
 </cross-domain-policy>
